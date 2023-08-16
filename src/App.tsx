@@ -1,54 +1,69 @@
 import { useState } from 'react'
-import { ProductType } from './types'
+import { Task } from './types'
 import { MdDoneOutline } from 'react-icons/md';
 import {VscError} from 'react-icons/vsc'
-// import styled from './App.module.css';
+import styled from './App.module.css';
+import { v4 as uuidv4 } from 'uuid';
+
+const info = {
+  id: '',
+  task: '',
+  completed: false,
+};
 
 function App() {
-  const [show, setShow] = useState(false);
-  const [checked, setChecked] = useState(false);
-  const [number, setNumber] = useState(0);
-  const [infos, setInfos] = useState<ProductType[]>([]);
-  const [tasks, setTasks] = useState<ProductType>({
-    id: number,
-    task: '',
-  });
+  const [selected, setSelected] = useState<any>({});
+  const [allTask, setAllTask] = useState<Task[]>([])
+  const [task, setTask] = useState<Task>(info);
 
-  const handleChange = ({target}: React.ChangeEvent<HTMLInputElement>) =>{
-    setTasks({
-      id: number,
-      task: target.value,
+
+  const handleChange = ({currentTarget}: React.ChangeEvent<HTMLInputElement>) =>{
+    setTask({
+      id: uuidv4(),
+      task: currentTarget.value,
+      completed: false,
     })
   }
 
   const handleClick = () => {
-    setInfos([...infos, tasks]);
-    setShow(true);
-    setNumber(number + 1)
-    setTasks({
-      id: number,
-      task: '',
-    })
+    setAllTask([...allTask, task])
+    setTask(info)
   }
-
   
+  const handleDelete = (id: string) => setAllTask((prev) => prev.filter((task) => task.id !== id));
 
-  const handleCheck = ({target}: React.ChangeEvent<HTMLInputElement>) => setChecked(target.checked);
+  const handleCheck = (event: React.ChangeEvent<HTMLInputElement>, id: string) => {
+      setSelected({...selected, [id]: event.target.checked})
+  } 
 
   return (
     <>
-    <header><h1>Minha lista de tarefas</h1></header>
+    <header style={{background: 'test'}}><h1>Todo List</h1></header>
     <label>
-    <input type="text" placeholder='Digite sua tarefa' value={tasks.task} onChange={handleChange}/>
+    <input type="text" placeholder='Digite sua tarefa' value={task.task} onChange={handleChange}/>
     </label>
     <button onClick={handleClick}>Adicionar</button>
-    {show && infos.map(({id, task}) => (
-          <label key={id}>
-            <input type="checkbox" name="task" checked={checked} onChange={handleCheck}/>
+    <main className={styled.container}>
+      {allTask.map(({id, task}) => (
+      <label key={id}>
+            <input 
+            type="checkbox"
+            value={task}
+            id={id}
+            onChange={(event) => handleCheck(event, id)}
+            />
             {task}
-            {checked ? <MdDoneOutline color='green' /> : <VscError color='red' />}
+            {!selected[id] ? (
+            <VscError 
+            onClick={() => handleDelete(id)} 
+            color='red' 
+            title='Remover'
+            size={15}
+            /> ) : 
+            <MdDoneOutline color='green' size={15} />}
           </label>
-    ))}
+      ))}
+    </main>
     </>
   )
 }
