@@ -1,9 +1,14 @@
 import { useState } from 'react'
 import { Task } from './types'
-import { MdDoneOutline } from 'react-icons/md';
-import {VscError} from 'react-icons/vsc'
-import styled from './App.module.css';
+import {FiMoon} from 'react-icons/fi';
+import { BsLightningCharge } from 'react-icons/bs'
 import { v4 as uuidv4 } from 'uuid';
+import AllTask from './components/AllTask/AllTask';
+import { ThemeProvider } from 'styled-components';
+import dark from './styles/themes/dark';
+import ligth from './styles/themes/light';
+import GlobalStyles from './styles/global';
+import { ContainerBody } from './App.styled';
 
 const info = {
   id: '',
@@ -12,9 +17,10 @@ const info = {
 };
 
 function App() {
-  const [selected, setSelected] = useState<any>({});
+  const [theme, setTheme] = useState<boolean>(false);
   const [allTask, setAllTask] = useState<Task[]>([])
   const [task, setTask] = useState<Task>(info);
+  const [isDarkTheme, setIsDarkTheme] = useState(false);
 
 
   const handleChange = ({currentTarget}: React.ChangeEvent<HTMLInputElement>) =>{
@@ -32,39 +38,42 @@ function App() {
   
   const handleDelete = (id: string) => setAllTask((prev) => prev.filter((task) => task.id !== id));
 
-  const handleCheck = (event: React.ChangeEvent<HTMLInputElement>, id: string) => {
-      setSelected({...selected, [id]: event.target.checked})
+  const handleCheck = (id: string) => {
+    const updateCheck = allTask.map(task => {
+      if (id === task.id) {
+        return { ...task, completed: !task.completed };
+      }
+      return task;
+    })
+    setAllTask(updateCheck);
   } 
 
+  const toggleTheme = () => {
+    setTheme(!theme)
+    setIsDarkTheme(prevState => !prevState)
+  }
+
   return (
-    <>
-    <header style={{background: 'test'}}><h1>Todo List</h1></header>
-    <label>
-    <input type="text" placeholder='Digite sua tarefa' value={task.task} onChange={handleChange}/>
-    </label>
-    <button onClick={handleClick}>Adicionar</button>
-    <main className={styled.container}>
-      {allTask.map(({id, task}) => (
-      <label key={id}>
-            <input 
-            type="checkbox"
-            value={task}
-            id={id}
-            onChange={(event) => handleCheck(event, id)}
-            />
-            {task}
-            {!selected[id] ? (
-            <VscError 
-            onClick={() => handleDelete(id)} 
-            color='red' 
-            title='Remover'
-            size={15}
-            /> ) : 
-            <MdDoneOutline color='green' size={15} />}
-          </label>
-      ))}
-    </main>
-    </>
+      <ThemeProvider theme={ isDarkTheme ? dark : ligth }>
+        <GlobalStyles />
+          <ContainerBody>
+            <header>
+              <h1>To-do List <span onClick={ toggleTheme }>
+                {!theme ? <FiMoon /> : <BsLightningCharge />}
+              </span>
+              </h1>
+            </header>
+            <div>
+              <input type="text" placeholder='Digite sua tarefa' value={task.task} onChange={handleChange}/>
+              <button onClick={handleClick}>Adicionar</button>
+            </div>
+              <AllTask 
+              allTask={allTask}
+              handleDelete={handleDelete}
+              handleCheck={handleCheck}
+              />
+            </ContainerBody>
+      </ThemeProvider>
   )
 }
 
