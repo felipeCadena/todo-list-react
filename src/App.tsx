@@ -54,17 +54,17 @@ function App() {
   }
 
   return (
-      <ThemeProvider theme={ isDarkTheme ? dark : ligth }>
+      <ThemeProvider theme={ !isDarkTheme ? dark : ligth }>
         <GlobalStyles />
           <ContainerBody>
             <header>
               <h1>To-do List <span onClick={ toggleTheme }>
-                {!theme ? <FiMoon /> : <BsLightningCharge />}
+                {!theme ? <FiMoon size={25} /> : <BsLightningCharge size={25} />}
               </span>
               </h1>
             </header>
             <div>
-              <input type="text" placeholder='Digite sua tarefa' value={task.task} onChange={handleChange}/>
+              <input className='inputTask' type="text" placeholder='Digite sua tarefa' value={task.task} onChange={handleChange}/>
               <button onClick={handleClick}>Adicionar</button>
             </div>
               <AllTask 
@@ -72,6 +72,11 @@ function App() {
               handleDelete={handleDelete}
               handleCheck={handleCheck}
               />
+              <div className='task_done'>
+                <p>{allTask.length} tarefa(s) adicionada(s)</p>
+                <p>{allTask.filter(task => task.completed).length} tarefa(s) concluída(s)</p>
+                <p>{allTask.filter(task => !task.completed).length} tarefa(s) pendente(s)</p>
+              </div>
             </ContainerBody>
       </ThemeProvider>
   )

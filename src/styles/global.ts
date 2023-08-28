@@ -1,14 +1,14 @@
 import { createGlobalStyle } from 'styled-components';
 
 const GlobalStyles = createGlobalStyle`
-  @font-face {
+  /* @font-face {
     font-family: "Josefin Sans";
     src: url("/fonts/JosefinSans-VariableFont_wght.ttf");
   }
 
   :root {
     font-family: "Josefin Sans", sans-serif;
-  }
+  } */
 
 * {
     margin: 0;
